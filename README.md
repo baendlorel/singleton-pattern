@@ -1,17 +1,18 @@
-# Singleton Pattern
+# singleton-pattern
 
 🦄 Wrap your class to make it a true singleton!
 
-> Note: Your environment must support Proxy
+> **Note**: Your environment must support ES6 Proxies.
 
 ## Overview
 
-`singleton-pattern` is a lightweight TypeScript/JavaScript utility that wraps a class constructor so that every `new` call returns the same instance. It uses Proxy to ensure singleton safety, and provides options for prototype handling.
+`singleton-pattern` is a lightweight TypeScript/JavaScript utility that wraps a class constructor so that every `new` call returns the same instance. It uses Proxy to ensure singleton safety, and provides options for prototype and proxy reuse.
 
 ## Features
 
 - Make any class a singleton with one line
 - Optionally control prototype.constructor behavior
+- Optionally reuse proxy for the same class (`options.onlyOnce`)
 - Retrieve the original class from a singletonified class
 - Fully type-safe
 
@@ -28,25 +29,35 @@ pnpm add singleton-pattern
 ```typescript
 import { singletonify, getSingletonTarget } from 'singleton-pattern';
 
-class MyClass {
+class Target {
   value: number;
   constructor(v: number) {
     this.value = v;
   }
 }
 
-const Singleton = singletonify(MyClass);
-const a = new Singleton(1);
-const b = new Singleton(2);
+// Basic singleton
+const S = singletonify(Target);
+const a = new S(1);
+const b = new S(2);
 console.log(a === b); // true
 console.log(a.value); // 1
 
-// Option: keep original prototype.constructor
-const Singleton2 = singletonify(MyClass, { changeProtoConstructor: false });
-console.log(Singleton2.prototype.constructor === MyClass); // true
-
 // Retrieve original class
-console.log(getSingletonTarget(Singleton)); // MyClass
+console.log(getSingletonTarget(S)); // Target
+
+// Option: keep original prototype.constructor
+const S2 = singletonify(Target, { changeProtoConstructor: false });
+console.log(S2.prototype.constructor === Target); // true
+
+// Option: onlyOnce (reuse proxy for same class)
+const S3 = singletonify(Target); // equivalent to (Target, { onlyOnce: true })
+const S4 = singletonify(Target); // equivalent to (Target, { onlyOnce: true })
+console.log(S3 === S4);
+
+const S5 = singletonify(Target, { onlyOnce: false });
+const S6 = singletonify(Target, { onlyOnce: false });
+console.log(S5 !== S6);
 ```
 
 ## API
@@ -56,7 +67,10 @@ console.log(getSingletonTarget(Singleton)); // MyClass
 Wraps a class constructor so that all `new` calls return the same instance.
 
 - `target`: The class to wrap
-- `options.changeProtoConstructor` (default: `true`): If not `false`, sets `prototype.constructor` to the singletonified class. If `false`, keeps the original constructor.
+- `options.changeProtoConstructor` (default: `true`): Boolean. If `true`, sets `prototype.constructor` to the singletonified class. If `false`, keeps the original constructor.
+- `options.onlyOnce` (default: `true`): Boolean. If `true`, reuses the same proxy for the same class. If `false`, creates a new proxy each time.
+
+> **Note**: the options object uses Boolean Evaluation(aka. Boolean(x) / if (x))
 
 ### `getSingletonTarget<T extends Class>(singleton: T): T | undefined`
 

@@ -36,11 +36,50 @@ describe('singletonify', () => {
     expect(Singleton.prototype.constructor).toBe(TestClass);
   });
 
+  it('should set prototype.constructor to proxy when changeProtoConstructor is true or undefined', () => {
+    class TestClass {}
+    const Singleton1 = singletonify(TestClass);
+    expect(Singleton1.prototype.constructor).toBe(Singleton1);
+
+    const Singleton2 = singletonify(TestClass, {});
+    expect(Singleton2.prototype.constructor).toBe(Singleton2);
+  });
+
+  it('should keep original prototype.constructor when changeProtoConstructor is false', () => {
+    class TestClass {}
+    const Singleton = singletonify(TestClass, { changeProtoConstructor: false });
+    expect(Singleton.prototype.constructor).toBe(TestClass);
+  });
+
   it('getSingletonTarget returns original class', () => {
     class TestClass {}
     const Singleton = singletonify(TestClass);
 
     expect(getSingletonTarget(Singleton)).toBe(TestClass);
     expect(getSingletonTarget(TestClass)).toBeUndefined();
+  });
+
+  it('should return same proxy if onlyOnce is true', () => {
+    class TestClass {}
+    const Singleton1 = singletonify(TestClass, { onlyOnce: true });
+    const Singleton2 = singletonify(TestClass, { onlyOnce: true });
+
+    expect(Singleton1).toBe(Singleton2);
+  });
+
+  it('should create new proxy if onlyOnce is false', () => {
+    class TestClass {}
+    const Singleton1 = singletonify(TestClass, { onlyOnce: false });
+    const Singleton2 = singletonify(TestClass, { onlyOnce: false });
+
+    expect(Singleton1).not.toBe(Singleton2);
+  });
+
+  it('should treat undefined/true/other as onlyOnce true', () => {
+    class TestClass {}
+    const Singleton1 = singletonify(TestClass, { onlyOnce: undefined });
+    const Singleton2 = singletonify(TestClass, { onlyOnce: true });
+
+    expect(Singleton1).toBe(Singleton2);
   });
 });

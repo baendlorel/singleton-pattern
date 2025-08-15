@@ -1,19 +1,13 @@
-import { ProxyConstruct } from './native.js';
+import { ObjectContruct, ProxyConstruct } from './native.js';
 
 class Singletonify {
   private readonly p2c = new WeakMap<ProxiedClass, Class>();
   private readonly c2p = new WeakMap<Class, ProxiedClass>();
 
-  /**
-   * Only `false` is considered as `false`
-   * - everthing else is considered as `true`
-   */
-  private isTrue(o: unknown): boolean {
-    return o !== false;
-  }
-
   singletonify<T extends Class>(target: T, options?: SingletonifyOptions): T {
-    if (this.isTrue(options?.onlyOnce) && this.p2c.has(target)) {
+    const { changeProtoConstructor = true, onlyOnce = true } = ObjectContruct(options);
+
+    if (onlyOnce && this.c2p.has(target)) {
       return this.c2p.get(target) as T;
     }
 
@@ -27,11 +21,11 @@ class Singletonify {
       },
     });
 
-    if (this.isTrue(options?.changeProtoConstructor)) {
+    if (changeProtoConstructor) {
       proxied.prototype.constructor = proxied;
     }
 
-    if (this.isTrue(options?.onlyOnce)) {
+    if (onlyOnce) {
       this.p2c.set(proxied, target);
       this.c2p.set(target, proxied);
     }
