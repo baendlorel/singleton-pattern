@@ -8,21 +8,21 @@ class TestClass {
   }
 }
 
-const SingletonTestClass = singletonify(TestClass);
+const Singleton = singletonify(TestClass);
 
 describe('singletonify', () => {
   it('should always return the same instance', () => {
-    const a = new SingletonTestClass(1);
-    const b = new SingletonTestClass(2);
+    const a = new Singleton(1);
+    const b = new Singleton(2);
     expect(a).toBe(b);
     expect(a.value).toBe(1); // Only first argument is used
   });
 
   it('prototype.constructor of singleton is proxied', () => {
-    expect(SingletonTestClass.prototype.constructor).toBe(SingletonTestClass);
+    expect(Singleton.prototype.constructor).toBe(Singleton);
   });
 
   it('prototype.constructor of target class is itself', () => {
-    expect(TestClass.prototype.constructor).toBe(TestClass);
+    expect(TestClass.prototype.constructor).toBe(Singleton);
   });
 });

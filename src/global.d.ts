@@ -1,2 +1,12 @@
 type Class = new (...args: any[]) => any;
-type InstanceTypeOf<T extends Class> = T extends new (...args: any) => infer R ? R : never;
+
+interface SingletonifyOptions {
+  /**
+   * Preventing the `.prototype.constructor` from being accessed
+   * - default is `true`
+   *   - **Only** when it is `false`, will remain the original constructor unchanged
+   * - will change `Origin.prototype.constructor` to the singletonified class
+   *   - this means Origin.prototype.constructor !== origin
+   */
+  hideProtoConstructor?: boolean;
+}
