@@ -45,7 +45,8 @@ const instance = new Singletonify();
  * Just wrap your class with this function to create a new class that always returns the same instance
  * @param target The class to be wrapped
  * @param options Advanced options
- * - keepProtoConstructor(default: `true`) when it is **not** `false`, will set `target.prototype.constructor` to the singletonified class
+ * - changeProtoConstructor(default: `true`) will set `target.prototype.constructor` to the singletonified class
+ * - onlyOnce(default: `true`) will cache the input and always return the same proxied class
  *
  * __PKG_INFO__
  */
