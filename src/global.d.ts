@@ -1,12 +1,22 @@
 type Class = new (...args: any[]) => any;
+type ProxiedClass = new (...args: any[]) => any;
 
 interface SingletonifyOptions {
   /**
    * Preventing the `.prototype.constructor` from being accessed
-   * - default is `true`
-   *   - **Only** when it is `false`, will remain the original constructor unchanged
+   *
+   * Default is `true`
+   * - **Only** when it is `false`, will remain the original constructor unchanged
    * - will change `Origin.prototype.constructor` to the singletonified class
    *   - this means Origin.prototype.constructor !== origin
    */
-  hideProtoConstructor?: boolean;
+  changeProtoConstructor?: boolean;
+
+  /**
+   * Default is `true`
+   * - it is **not recommended** to set this to `false`
+   *   - if `false`, it will create a new singletonified class every time and will not cache it
+   * - by default, wrap a class multiple times will always return the same singletonified class
+   */
+  onlyOnce?: boolean;
 }

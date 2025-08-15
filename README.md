@@ -42,7 +42,7 @@ console.log(a === b); // true
 console.log(a.value); // 1
 
 // Option: keep original prototype.constructor
-const Singleton2 = singletonify(MyClass, { hideProtoConstructor: false });
+const Singleton2 = singletonify(MyClass, { changeProtoConstructor: false });
 console.log(Singleton2.prototype.constructor === MyClass); // true
 
 // Retrieve original class
@@ -56,7 +56,7 @@ console.log(getSingletonTarget(Singleton)); // MyClass
 Wraps a class constructor so that all `new` calls return the same instance.
 
 - `target`: The class to wrap
-- `options.hideProtoConstructor` (default: `true`): If not `false`, sets `prototype.constructor` to the singletonified class. If `false`, keeps the original constructor.
+- `options.changeProtoConstructor` (default: `true`): If not `false`, sets `prototype.constructor` to the singletonified class. If `false`, keeps the original constructor.
 
 ### `getSingletonTarget<T extends Class>(singleton: T): T | undefined`
 

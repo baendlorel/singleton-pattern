@@ -31,7 +31,7 @@ describe('singletonify', () => {
 
   it('can keep original prototype.constructor if option is set', () => {
     class TestClass {}
-    const Singleton = singletonify(TestClass, { hideProtoConstructor: false });
+    const Singleton = singletonify(TestClass, { changeProtoConstructor: false });
 
     expect(Singleton.prototype.constructor).toBe(TestClass);
   });

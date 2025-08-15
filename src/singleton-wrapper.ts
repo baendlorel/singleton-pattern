@@ -1,9 +1,22 @@
 import { ProxyConstruct } from './native.js';
 
 class Singletonify {
-  private readonly map = new WeakMap<Class, Class>();
+  private readonly p2c = new WeakMap<ProxiedClass, Class>();
+  private readonly c2p = new WeakMap<Class, ProxiedClass>();
+
+  /**
+   * Only `false` is considered as `false`
+   * - everthing else is considered as `true`
+   */
+  private isTrue(o: unknown): boolean {
+    return o !== false;
+  }
 
   singletonify<T extends Class>(target: T, options?: SingletonifyOptions): T {
+    if (this.isTrue(options?.onlyOnce) && this.p2c.has(target)) {
+      return this.c2p.get(target) as T;
+    }
+
     let instance: any;
     const proxied = new ProxyConstruct(target, {
       construct(cls, args) {
@@ -14,15 +27,20 @@ class Singletonify {
       },
     });
 
-    if (options?.hideProtoConstructor !== false) {
+    if (this.isTrue(options?.changeProtoConstructor)) {
       proxied.prototype.constructor = proxied;
     }
-    this.map.set(proxied, target);
+
+    if (this.isTrue(options?.onlyOnce)) {
+      this.p2c.set(proxied, target);
+      this.c2p.set(target, proxied);
+    }
+
     return proxied;
   }
 
   getSingletonTarget<T extends Class>(singleton: T): T | undefined {
-    return this.map.get(singleton) as T | undefined;
+    return this.p2c.get(singleton) as T | undefined;
   }
 }
 
@@ -33,7 +51,7 @@ const instance = new Singletonify();
  * Just wrap your class with this function to create a new class that always returns the same instance
  * @param target The class to be wrapped
  * @param options Advanced options
- * - hideProtoConstructor(default: `true`) when it is **not** `false`, will set `target.prototype.constructor` to the singletonified class
+ * - keepProtoConstructor(default: `true`) when it is **not** `false`, will set `target.prototype.constructor` to the singletonified class
  *
  * __PKG_INFO__
  */
