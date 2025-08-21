@@ -4,6 +4,8 @@
 
 > **Note**: Your environment must support ES6 Proxies.
 
+For more awesome packages, check out [my homepage💛](https://baendlorel.github.io/?repoType=npm)
+
 ## Overview
 
 `singleton-pattern` is a lightweight TypeScript/JavaScript utility that wraps a class constructor so that every `new` call returns the same instance. It uses Proxy to ensure singleton safety, and provides options for prototype and proxy reuse.
